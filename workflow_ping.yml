@@ -1,0 +1,22 @@
+# workflow_ping.yml
+---
+name: "PingHealthCheck"
+namespace: "/PingHealthCheck/Workflows"
+description: "Workflow to ping an IP address"
+enabled: true
+inputs:
+  - name: "target_ip"
+    type: "string"
+    description: "The IP address to ping"
+    required: true
+steps:
+  - name: "Ping IP Address"
+    method: "/PingHealthCheck/Methods/PingHost"
+    inputs:
+      - name: "target_ip"
+        value: "<%= @inputs[:target_ip] %>"
+    outputs:
+      result: "ping_result"
+  - name: "Output Result"
+    action: "log"
+    message: "<%= @outputs[:ping_result] %>"
