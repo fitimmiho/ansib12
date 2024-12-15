@@ -1,0 +1,8 @@
+---
+- name: Ping Hosts for Availability (ICMP)
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Ping the hosts using ICMP
+      command: ping -c 1 {{ ansible_host }}
+      ignore_errors: yes
