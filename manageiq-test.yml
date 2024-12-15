@@ -1,0 +1,27 @@
+---
+vars:
+  - manageiq_validate_certs: false
+
+roles:
+  - manageiq-core.manageiq-vmdb
+
+tasks:
+  - name: Get the list of running VMs
+    manageiq_vmdb:
+      href: "/vms"
+      query:
+        - state: "on"  # Only VMs that are running
+    register: running_vms
+
+  - name: Ping each VM to check if it is up
+    ping:
+      host: "{{ item.ipaddresses[0] }}"  # Assuming 'ipaddresses' is a field in VM object
+    loop: "{{ running_vms.resources }}"
+    register: ping_result
+    ignore_errors: yes  # Ignore errors if ping fails
+
+  - name: Report Ping Result
+    debug:
+      msg: "VM {{ item.name }} is reachable: {{ ping_result.results[loop.index0].ping }}"
+    when: ping_result is defined and ping_result.results[loop.index0].ping is defined
+    loop: "{{ running_vms.resources }}"
